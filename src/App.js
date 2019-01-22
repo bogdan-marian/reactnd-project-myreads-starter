@@ -4,16 +4,16 @@ import './App.css'
 
 class BookSelf extends React.Component {
   render() {
-    const bself = this.props.bself;
+    console.log("bookSelf: " + this.props);
+    const bselfs = this.props.bselfs;
     return (
       <div className="bookshelf">
-        <h2 className="bookshelf-title">{bself}</h2>
+        {bselfs.map((bself) => (
+          <li key={bself.shelf}>{bself.shelf}</li>
+        ))}
+        <h2 className="bookshelf-title">{bselfs.c}</h2>
         <div className="bookshelf-books">
-          <BookList books={[
-          { title: 'book 1 '},
-          { title: 'book 2' },
-          { title: 'book 3 '}
-        ]} />
+          book-list-placeholder
         </div>
       </div>
     )
@@ -41,10 +41,44 @@ class BooksApp extends React.Component {
      * users can use the browser's back and forward buttons to navigate between
      * pages, as well as provide a good URL they can bookmark and share.
      */
-    showSearchPage: false
-  }
+    showSearchPage: false,
+    books: [
+      {
+        id: 'book1',
+        name: 'book 1',
+        shelf: 'a'
+
+      },
+      {
+        id: 'book2',
+        name: 'book 2',
+        shelf: 'a'
+      },
+      {
+        id: 'book3',
+        name: 'book 3',
+        shelf: 'b'
+      }
+    ]
+  };
+
+
+
+
+
+  groupBy(objectArray, property) {
+    return objectArray.reduce(function (acc, obj) {
+      var key = obj[property];
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(obj);
+      return acc;
+    }, {});
+  };
 
   render() {
+    console.log(this.groupBy(this.state.books, 'shelf'))
     return (
       <div className="list-books">
         <div className="list-books-title">
@@ -52,7 +86,9 @@ class BooksApp extends React.Component {
         </div>
         <div className="list-books-content">
           <div>
-            <BookSelf />
+            <BookSelf
+              bselfs={this.groupBy(this.state.books, 'shelf')}
+            />
           </div>
         </div>
         <div className="open-search">
