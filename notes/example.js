@@ -1,36 +1,42 @@
-import React from 'react'
+import React from 'react';
 // import * as BooksAPI from './BooksAPI'
-import './App.css'
+import './App.css';
 
 class BookSelf extends React.Component {
   render() {
-    const { books, shelfTitle, shelfTitles } = this.props;
+    const { id, books, onBookClick } = this.props;
+
     return (
-      <div className="bookshelf">
-        <h2 className="bookshelf-title">{shelfTitle}</h2>
-        <div className="bookshelf-books">
-          <BookList
-            books={books}
-          />
-        </div>
+      <div className='bookshelf'>
+        <h2 className='bookshelf-title'>{id}</h2>
+        <BookList
+          books={books}
+          onClick={bookId => {
+            onBookClick(bookId, id);
+          }}
+        />
       </div>
-    )
+    );
   }
 }
 
 class BookList extends React.Component {
   render() {
-    const { books } = this.props;
-    console.log("BookList books = " + books)
+    const { books, onClick } = this.props;
     return (
-      <ol className="books-grid">
+      <ol className='books-grid'>
         {books.map(book => (
-          <li key={book.id}>
+          <li
+            key={book.id}
+            onClick={() => {
+              onClick(book.id);
+            }}
+          >
             {book.name}
           </li>
         ))}
       </ol>
-    )
+    );
   }
 }
 
@@ -48,7 +54,6 @@ class BooksApp extends React.Component {
         id: 'book1',
         name: 'book 1',
         shelf: 'a'
-
       },
       {
         id: 'book2',
@@ -63,12 +68,8 @@ class BooksApp extends React.Component {
     ]
   };
 
-
-
-
-
   groupBy(objectArray, property) {
-    return objectArray.reduce(function (acc, obj) {
+    return objectArray.reduce(function(acc, obj) {
       var key = obj[property];
       if (!acc[key]) {
         acc[key] = [];
@@ -76,39 +77,58 @@ class BooksApp extends React.Component {
       acc[key].push(obj);
       return acc;
     }, {});
+  }
+
+  onBookClick = (bookId, shelfId) => {
+    let { books } = this.state;
+
+    let newShelfId = 'a';
+    if (shelfId === 'a') {
+      newShelfId = 'b';
+    }
+
+    let newBooks = books.map(book => {
+      if (book.id === bookId) {
+        book.shelf = newShelfId;
+      }
+      return book;
+    });
+    this.setState({
+      books: newBooks
+    });
   };
 
   render() {
+    console.log(this.groupBy(this.state.books, 'shelf'));
+
     const processedData = this.groupBy(this.state.books, 'shelf');
-    const shelfTitles = Object.keys(processedData);
     const shelves = Object.keys(processedData).map(key => {
       const books = processedData[key];
       return (
         <BookSelf
           key={key}
-          shelfTitle={key}
-          shelfTitles
+          id={key}
           books={books}
+          onBookClick={this.onBookClick}
         />
       );
     });
-
     return (
-      <div className="list-books">
-        <div className="list-books-title">
+      <div className='list-books'>
+        <div className='list-books-title'>
           <h1>MyReads</h1>
         </div>
-        <div className="list-books-content">
-          <div>
-            {shelves}
-          </div>
+        <div className='list-books-content'>
+          <div>{shelves}</div>
         </div>
-        <div className="open-search">
-          <button onClick={() => this.setState({ showSearchPage: true })}>Add a book</button>
+        <div className='open-search'>
+          <button onClick={() => this.setState({ showSearchPage: true })}>
+            Add a book
+          </button>
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default BooksApp
+export default BooksApp;
