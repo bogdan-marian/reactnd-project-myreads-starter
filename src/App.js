@@ -4,13 +4,14 @@ import './App.css'
 
 class BookSelf extends React.Component {
   render() {
-    const { books, shelfTitle, shelfTitles } = this.props;
+    const { books, shelfTitle, changeSelf } = this.props;
     return (
       <div className="bookshelf">
         <h2 className="bookshelf-title">{shelfTitle}</h2>
         <div className="bookshelf-books">
           <BookList
             books={books}
+            changeSelf={changeSelf}
           />
         </div>
       </div>
@@ -18,17 +19,39 @@ class BookSelf extends React.Component {
   }
 }
 
+class BookItem extends React.Component {
+  render() {
+    const { book, changeSelf } = this.props;
+
+    return (
+      <li>
+        <div className="book">
+          <div className="book-top">
+            <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
+            <div className="book-shelf-changer">
+              <select onChange={(e) => { changeSelf(book.id, e.target.value) }} value="move">
+                <option value="move" disabled >Move to...</option>
+                <option value="currentlyReading">Currently Reading</option>
+                <option value="wantToRead">Want to Read</option>
+                <option value="read">Read</option>
+                <option value="none">None</option>
+              </select>
+            </div>
+          </div>
+          <div className="book-title">{book.title}</div>
+          {book.authors.map(author => <div className="book-authors" key={author}>{author}</div>)}
+        </div>
+      </li>
+    )
+  }
+}
+
 class BookList extends React.Component {
   render() {
-    const { books } = this.props;
-    console.log("BookList books = " + books)
+    const { books, changeSelf } = this.props;
     return (
       <ol className="books-grid">
-        {books.map(book => (
-          <li key={book.id}>
-            {book.name}
-          </li>
-        ))}
+        {books.map(b => <BookItem key={b.title} book={b} changeSelf={changeSelf} />)}
       </ol>
     )
   }
@@ -43,31 +66,13 @@ class BooksApp extends React.Component {
      * pages, as well as provide a good URL they can bookmark and share.
      */
     showSearchPage: false,
-    books:[]
-    // books: [
-    //   {
-    //     id: 'book1',
-    //     name: 'book 1',
-    //     shelf: 'a'
-
-    //   },
-    //   {
-    //     id: 'book2',
-    //     name: 'book 2',
-    //     shelf: 'a'
-    //   },
-    //   {
-    //     id: 'book3',
-    //     name: 'book 3',
-    //     shelf: 'b'
-    //   }
-    // ]
+    books: []
   };
 
-  componentDidMount(){
+  componentDidMount() {
     BooksAPI.getAll()
-      .then((books)=>{
-        this.setState(()=>({books}))
+      .then((books) => {
+        this.setState(() => ({ books }))
       })
   }
 
@@ -80,20 +85,34 @@ class BooksApp extends React.Component {
       acc[key].push(obj);
       return acc;
     }, {});
-  };
+  }
+
+  changeSelf = (bookId, shelfId) => {
+    console.log("changeSelf: " + bookId + " / " + shelfId)
+    let { books } = this.state;
+    let newBooks = books.map(book => {
+      if (book.id === bookId) {
+        book.shelf = shelfId;
+      }
+      return book;
+    })
+    this.setState({
+      books: newBooks
+    })
+  }
+
 
   render() {
-    console.log("Books: " + this.state.books);
     const processedData = this.groupBy(this.state.books, 'shelf');
-    const shelfTitles = Object.keys(processedData);
     const shelves = Object.keys(processedData).map(key => {
       const books = processedData[key];
+      console.log('mybooks ' + books);
       return (
         <BookSelf
           key={key}
           shelfTitle={key}
-          shelfTitles
           books={books}
+          changeSelf={this.changeSelf}
         />
       );
     });
