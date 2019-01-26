@@ -1,5 +1,5 @@
 import React from 'react'
-// import * as BooksAPI from './BooksAPI'
+import * as BooksAPI from './BooksAPI'
 import './App.css'
 
 class BookSelf extends React.Component {
@@ -43,29 +43,33 @@ class BooksApp extends React.Component {
      * pages, as well as provide a good URL they can bookmark and share.
      */
     showSearchPage: false,
-    books: [
-      {
-        id: 'book1',
-        name: 'book 1',
-        shelf: 'a'
+    books:[]
+    // books: [
+    //   {
+    //     id: 'book1',
+    //     name: 'book 1',
+    //     shelf: 'a'
 
-      },
-      {
-        id: 'book2',
-        name: 'book 2',
-        shelf: 'a'
-      },
-      {
-        id: 'book3',
-        name: 'book 3',
-        shelf: 'b'
-      }
-    ]
+    //   },
+    //   {
+    //     id: 'book2',
+    //     name: 'book 2',
+    //     shelf: 'a'
+    //   },
+    //   {
+    //     id: 'book3',
+    //     name: 'book 3',
+    //     shelf: 'b'
+    //   }
+    // ]
   };
 
-
-
-
+  componentDidMount(){
+    BooksAPI.getAll()
+      .then((books)=>{
+        this.setState(()=>({books}))
+      })
+  }
 
   groupBy(objectArray, property) {
     return objectArray.reduce(function (acc, obj) {
@@ -79,6 +83,7 @@ class BooksApp extends React.Component {
   };
 
   render() {
+    console.log("Books: " + this.state.books);
     const processedData = this.groupBy(this.state.books, 'shelf');
     const shelfTitles = Object.keys(processedData);
     const shelves = Object.keys(processedData).map(key => {
