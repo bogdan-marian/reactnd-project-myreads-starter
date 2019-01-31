@@ -28,6 +28,17 @@ class BooksApp extends React.Component {
       })
   }
 
+  addNewBook = (book, shelf) => {
+    BooksAPI.update(book, shelf)
+      .then((bookResponse) => {
+        book.shelf = shelf
+        let newBooks = this.state.books.concat([book])
+        this.setState({
+          books: newBooks
+        })
+      })
+  }
+
   groupBy(objectArray, property) {
     return objectArray.reduce(function (acc, obj) {
       var key = obj[property];
@@ -39,22 +50,42 @@ class BooksApp extends React.Component {
     }, {});
   }
 
-  changeSelf = (bookId, shelfId) => {
-    console.log("changeSelf: " + bookId + " / " + shelfId)
+  changeSelf = (bookItem, shelfId) => {
     let { books } = this.state;
+    let isNewBook = true;
     let newBooks = books.map(book => {
-      if (book.id === bookId) {
+      if (book.id === bookItem.id) {
         book.shelf = shelfId;
+        isNewBook = false; //is not a new book wee found it on the shelfs
       }
       return book;
     })
-    this.setState({
-      books: newBooks
-    })
+    if (isNewBook) {
+      this.addNewBook(bookItem, shelfId)
+    } else {
+      BooksAPI.update(bookItem, shelfId).then((bookResponse) => {
+        this.setState({
+          books: newBooks
+        })
+      })
+
+    }
   }
 
-  addBookToShelf = (bookId, shelfI) => {
-    console.log("addBookToShelf from app called ");
+  orderDictionary = {
+    "currentlyReading": 1,
+    "wantToRead": 2,
+    "read": 3
+  }
+
+  compareShelfs = (a, b) => {
+    if (this.orderDictionary[a.key] < this.orderDictionary[b.key]) {
+      return -1
+    }
+    if (this.orderDictionary[a.key] > this.orderDictionary[b.key]) {
+      return 1
+    }
+    return 0
   }
 
   render() {
@@ -69,9 +100,7 @@ class BooksApp extends React.Component {
           changeSelf={this.changeSelf}
         />
       );
-    });
-
-
+    }).sort(this.compareShelfs);
 
     return (
       <div>
@@ -96,7 +125,7 @@ class BooksApp extends React.Component {
         <Route
           exact path='/search'
           // render={(props) => <Dashboard {...props} isAuthed={true} />}
-          render={(props) => (<SearchMain {...props}  addBookToShelf={this.addBookToShelf} />)}
+          render={(props) => (<SearchMain {...props} addBookToShelf={this.changeSelf} />)}
         // component={SearchMain} 
         />
       </div>
