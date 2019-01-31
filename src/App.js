@@ -53,11 +53,14 @@ class BooksApp extends React.Component {
     })
   }
 
+  addBookToShelf = (bookId, shelfI) => {
+    console.log("addBookToShelf from app called ");
+  }
+
   render() {
     const processedData = this.groupBy(this.state.books, 'shelf');
     const shelves = Object.keys(processedData).map(key => {
       const books = processedData[key];
-      console.log('mybooks ' + books);
       return (
         <BookSelf
           key={key}
@@ -67,6 +70,8 @@ class BooksApp extends React.Component {
         />
       );
     });
+
+
 
     return (
       <div>
@@ -88,7 +93,12 @@ class BooksApp extends React.Component {
             </div>
           </div>
         )} />
-        <Route exact path='/search' component={SearchMain} />
+        <Route
+          exact path='/search'
+          // render={(props) => <Dashboard {...props} isAuthed={true} />}
+          render={(props) => (<SearchMain {...props}  addBookToShelf={this.addBookToShelf} />)}
+        // component={SearchMain} 
+        />
       </div>
     )
   }
