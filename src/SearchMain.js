@@ -23,6 +23,9 @@ class SearchMain extends Component {
           this.setState({ books: foundBooks })
         }
       })
+    }else {
+      let noBooks = []
+      this.setState({books: noBooks})
     }
   }
 
