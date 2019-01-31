@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import BookList from './BookList'
+import {ToastContainer, toast} from 'react-toastify'
 
 class SearchMain extends Component {
   constructor(props) {
@@ -56,6 +57,7 @@ class SearchMain extends Component {
             changeSelf={addBookToShelf}
           />
         </div>
+        <ToastContainer />
       </div>
     )
   }

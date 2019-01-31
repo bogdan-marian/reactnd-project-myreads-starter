@@ -5,6 +5,8 @@ import BookSelf from './BookSelf'
 import { Link } from 'react-router-dom'
 import { Route } from 'react-router-dom'
 import SearchMain from './SearchMain'
+import {ToastContainer, toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -60,6 +62,7 @@ class BooksApp extends React.Component {
       }
       return book;
     })
+    toast("Adding [" + bookItem.title + "] book to [" + this.shelfNames[shelfId]+"] shelf");
     if (isNewBook) {
       this.addNewBook(bookItem, shelfId)
     } else {
@@ -70,6 +73,12 @@ class BooksApp extends React.Component {
       })
 
     }
+  }
+
+  shelfNames = {
+    "currentlyReading": "Currently Reading",
+    "wantToRead": "Want to Read",
+    "read": "Read"
   }
 
   orderDictionary = {
@@ -95,7 +104,7 @@ class BooksApp extends React.Component {
       return (
         <BookSelf
           key={key}
-          shelfTitle={key}
+          shelfTitle={this.shelfNames[key]}
           books={books}
           changeSelf={this.changeSelf}
         />
@@ -120,6 +129,7 @@ class BooksApp extends React.Component {
                 <button >Add a book</button>
               </Link>
             </div>
+            <ToastContainer />
           </div>
         )} />
         <Route
