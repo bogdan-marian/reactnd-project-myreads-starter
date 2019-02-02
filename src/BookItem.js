@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 
 
 
@@ -7,9 +7,18 @@ class BookItem extends React.Component {
     const { book, changeSelf } = this.props;
 
     let authors; //sometimes wee have to double check if wee have authors
-    if (book.authors && book.authors.length > 0){
+    if (book.authors && book.authors.length > 0) {
       authors = book.authors.map(author => <div className="book-authors" key={author}>{author}</div>)
     }
+
+    let shelfKeys = [
+      "currentlyReading",
+      "wantToRead",
+      "read"
+    ]
+
+    let isOwened = (shelfKeys.includes(book.shelf) ? true : false)
+    let shelfValue = isOwened ? book.shelf : "move"
 
     return (
       <li>
@@ -17,7 +26,7 @@ class BookItem extends React.Component {
           <div className="book-top">
             <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
             <div className="book-shelf-changer">
-              <select onChange={(e) => { changeSelf(book, e.target.value) }} value="move">
+              <select onChange={(e) => { changeSelf(book, e.target.value) }} value={shelfValue}>
                 <option value="move" disabled >Move to...</option>
                 <option value="currentlyReading">Currently Reading</option>
                 <option value="wantToRead">Want to Read</option>
@@ -27,7 +36,7 @@ class BookItem extends React.Component {
             </div>
           </div>
           <div className="book-title">{book.title}</div>
-            {authors}
+          {authors}
         </div>
       </li>
     )
