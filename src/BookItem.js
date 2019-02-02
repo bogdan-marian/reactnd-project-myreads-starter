@@ -4,12 +4,14 @@ import React, { Component } from 'react'
 
 class BookItem extends React.Component {
   render() {
-    const { book, changeSelf } = this.props;
+    const { book, changeSelf, allBooks } = this.props;
 
     let authors; //sometimes wee have to double check if wee have authors
     if (book.authors && book.authors.length > 0) {
       authors = book.authors.map(author => <div className="book-authors" key={author}>{author}</div>)
     }
+
+
 
     let shelfKeys = [
       "currentlyReading",
@@ -17,8 +19,15 @@ class BookItem extends React.Component {
       "read"
     ]
 
-    let isOwened = (shelfKeys.includes(book.shelf) ? true : false)
-    let shelfValue = isOwened ? book.shelf : "move"
+    let bookOfIntrest
+    if (allBooks) {
+      bookOfIntrest = allBooks.find(item => {
+        return item.id === book.id
+      })
+    }
+
+    let isOwened = ((bookOfIntrest !== undefined) ? true : false)
+    let shelfValue = isOwened ? book.shelf : "none"
 
     return (
       <li>
@@ -31,7 +40,7 @@ class BookItem extends React.Component {
                 <option value="currentlyReading">Currently Reading</option>
                 <option value="wantToRead">Want to Read</option>
                 <option value="read">Read</option>
-                {/* <option value="none">None</option> */}
+                {isOwened ? "" : <option value="none">None</option>}
               </select>
             </div>
           </div>

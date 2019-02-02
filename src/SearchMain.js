@@ -5,9 +5,6 @@ import BookList from './BookList'
 import {ToastContainer, toast} from 'react-toastify'
 
 class SearchMain extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   state = {
     books: []
@@ -34,7 +31,7 @@ class SearchMain extends Component {
   // }
 
   render() {
-    const { addBookToShelf } = this.props;
+    const { addBookToShelf, allBooks } = this.props;
     return (
       <div className="search-books">
         <div className="search-books-bar">
@@ -58,6 +55,7 @@ class SearchMain extends Component {
           <BookList
             books={this.state.books}
             changeSelf={addBookToShelf}
+            allBooks={allBooks}
           />
         </div>
         <ToastContainer />

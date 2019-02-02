@@ -8,9 +8,6 @@ import SearchMain from './SearchMain'
 import {ToastContainer, toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 
-
-
-
 class BooksApp extends React.Component {
   state = {
     /**
@@ -107,6 +104,7 @@ class BooksApp extends React.Component {
           shelfTitle={this.shelfNames[key]}
           books={books}
           changeSelf={this.changeSelf}
+          allBooks={this.state.books}
         />
       );
     }).sort(this.compareShelfs);
@@ -135,7 +133,7 @@ class BooksApp extends React.Component {
         <Route
           exact path='/search'
           // render={(props) => <Dashboard {...props} isAuthed={true} />}
-          render={(props) => (<SearchMain {...props} addBookToShelf={this.changeSelf} />)}
+          render={(props) => (<SearchMain {...props} addBookToShelf={this.changeSelf} allBooks={this.state.books}/>)}
         // component={SearchMain} 
         />
       </div>
