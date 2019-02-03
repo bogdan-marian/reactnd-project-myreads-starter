@@ -7,7 +7,7 @@ class BookList extends React.Component {
     return (
       <ol className="books-grid">
         {books.map(b => <BookItem
-          key={b.title}
+          key={b.id}
           book={b}
           changeSelf={changeSelf}
           allBooks={allBooks} />)}

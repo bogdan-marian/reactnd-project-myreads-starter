@@ -2,36 +2,74 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import BookList from './BookList'
-import {ToastContainer, toast} from 'react-toastify'
+import { ToastContainer } from 'react-toastify'
+import { DebounceInput } from 'react-debounce-input';
 
 class SearchMain extends Component {
+  querryIsValid = false;
+  allTerms = ['Android', 'Art', 'Artificial Intelligence', 'Astronomy', 'Austen', 'Baseball', 'Basketball',
+    'Bhagat', 'Biography', 'Brief', 'Business', 'Camus', 'Cervantes', 'Christie', 'Classics', 'Comics', 'Cook',
+    'Cricket', 'Cycling', 'Desai', 'Design', 'Development', 'Digital Marketing', 'Drama', 'Drawing', 'Dumas',
+    'Education', 'Everything', 'Fantasy', 'Film', 'Finance', 'First', 'Fitness', 'Football', 'Future', 'Games',
+    'Gandhi', 'Homer', 'Horror', 'Hugo', 'Ibsen', 'Journey', 'Kafka', 'King', 'Lahiri', 'Larsson', 'Learn',
+    'Literary Fiction', 'Make', 'Manage', 'Marquez', 'Money', 'Mystery', 'Negotiate', 'Painting', 'Philosophy',
+    'Photography', 'Poetry', 'Production', 'Programming', 'React', 'Redux', 'River', 'Robotics', 'Rowling',
+    'Satire', 'Science Fiction', 'Shakespeare', 'Singh', 'Swimming', 'Tale', 'Thrun', 'Time', 'Tolstoy', 'Travel',
+    'Ultimate', 'Virtual Reality', 'Web Development', 'iOS'];
+  validator = this.allTerms.join(',').toLowerCase();
+
+
+
 
   state = {
-    books: []
+    books: [],
+    badTerms: []
+  };
+
+  /**
+   * It checks if the query have some bad params
+   * @param {*} query 
+   */
+  getBadTerms(query) {
+    let tokens = query.split(" ");
+    let terms = [];
+    tokens.forEach(element => {
+
+      if (!this.validator.includes(element.toLowerCase())) {
+        terms.push(element)
+      }
+    });
+    return terms;
   }
 
   queryChange(event) {
-
+    this.setState({ books: [], badTerms:[] })
     let query = event.target.value
-    if (query !== '') {
+    query = query.trim()
+    if (query === '') {
+      this.setState({ books: [] })
+      return;
+    }
+
+    let badTerms = this.getBadTerms(query);
+    if (badTerms.length < 1) {
       BooksAPI.search(query).then((books) => {
         if (books && books.length > 0) {
           let foundBooks = books.filter((book) => (book.imageLinks && book.imageLinks.thumbnail))
-          this.setState({ books: foundBooks })
+          this.setState({ books: foundBooks, badTerms: [] })
         }
       })
-    }else {
-      let noBooks = []
-      this.setState({books: noBooks})
+    } else {
+      this.setState({
+        books: [],
+        badTerms: badTerms
+      })
     }
   }
 
-  // addBokToShelf = (bookId, shelfId) => {
-  //   console.log("justChangeShelf");
-  // }
-
   render() {
     const { addBookToShelf, allBooks } = this.props;
+
     return (
       <div className="search-books">
         <div className="search-books-bar">
@@ -48,15 +86,18 @@ class SearchMain extends Component {
               However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
               you don't find a specific author or title. Every search is limited by search terms.
             */}
-            <input type="text" placeholder="Search by title or author" onChange={evt => this.queryChange(evt)} />
+            <DebounceInput type="text" placeholder="Search by title or author" onChange={evt => this.queryChange(evt)} />
           </div>
         </div>
         <div className="search-books-results">
-          <BookList
+          {(this.state.badTerms.length < 1) ? <BookList
             books={this.state.books}
             changeSelf={addBookToShelf}
             allBooks={allBooks}
-          />
+          /> :
+            <div>You have used some bad search terms:<br></br>
+              {this.state.badTerms.join()}
+              {<div><br></br>Please use one of this terms: <br></br>{this.validator}</div>}</div>}
         </div>
         <ToastContainer />
       </div>
